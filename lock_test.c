@@ -92,6 +92,7 @@ void the_really_bad_lock_test(int num_threads)
 
 	printf("test done, stupidness is (%d/%d) - 1 = %f \n",
 			num_threads*THE_M_VALUE, protected_var, stupidness);
+	printf("the_really_bad_lock_test %d,%f\n",num_threads, stupidness);
 }
 
 int main(int argc, char* argv[])
@@ -103,20 +104,21 @@ int main(int argc, char* argv[])
 		printf("Just one arg, number of threads.\ne.g. ./test 3\n");
 	} else {
 		the_N_value = atoi(argv[1]);
-		if(the_N_value < 2)
+		if(the_N_value < 2) {
 			printf("gud joke, but i'll do it with 2 threads\n");
-		else if(the_N_value > 100) {
+			the_N_value = 2;
+		} else if(the_N_value > 100) {
 			printf("Surely You're Joking, Mr. Feynman!\n");
 			printf("My machine is old, it can only go till 100\n");
-		}
-		else
+			the_N_value = 100;
+		} else
 			printf("will run %d threads\n", the_N_value);
 	}
 
 	/*comment out if running all of them for large N values is taking long*/
 
-	protected_var = 0;
-	the_correct_spinlock_test(the_N_value);
+//	protected_var = 0;
+//	the_correct_spinlock_test(the_N_value);
 
 	protected_var = 0;
 	the_really_bad_lock_test(the_N_value);
