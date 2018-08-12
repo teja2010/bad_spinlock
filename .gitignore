@@ -1,0 +1,9 @@
+.*
+*.out
+*.o
+
+cscope.*
+TAGS
+tags
+
+!.gitignore
