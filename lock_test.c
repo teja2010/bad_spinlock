@@ -101,6 +101,87 @@ void the_really_bad_lock_test(int num_threads)
 	printf("the_really_bad_lock_test %d,%f\n",num_threads, stupidness);
 }
 
+/*test2. the ct lock test*/
+struct ct_lock *global_ct_lock;
+void* the_ct_lock_thread(void *arg)
+{
+	struct per_thread_data ptd;
+	long int i = THE_M_VALUE;
+
+	printf("s");
+	while(i--) {
+		ct_lock(global_ct_lock, &ptd);
+		protected_var++;
+		ct_unlock(global_ct_lock);
+	}
+	printf("d");
+	done_var++;
+
+	return arg;
+}
+
+void the_ct_lock_test(int num_threads)
+{
+	//int tcount;
+	//pthread_t *thread_id;
+	double stupidness;
+
+	printf("\n*** The CACHE TIME test\n");
+	global_ct_lock = ct_lock_init();
+	create_and_join_threads(num_threads, the_ct_lock_thread);
+	ct_lock_free(global_ct_lock);
+
+	stupidness =  (double)(num_threads*THE_M_VALUE);
+	stupidness /= (double)     protected_var;
+	stupidness -= 1.0;
+
+	printf("test done, stupidness is (%d/%d) - 1 = %f \n",
+			num_threads*THE_M_VALUE, protected_var, stupidness);
+	printf("the_cache_time_lock_test %d,%f\n",num_threads, stupidness);
+}
+
+/*test 3 peterson's algo*/
+struct pete2_lock *global_p2_lock;
+void* the_p2_lock_thread(void *arg)
+{
+	int ID = *(int *)arg;
+	long int i = THE_M_VALUE;
+	//unsigned int usecs = 0;
+
+	printf("s%d", ID);
+	while(i--) {
+		p2_lock(global_p2_lock, ID);
+		protected_var++;
+		p2_unlock(global_p2_lock, ID);
+		//usecs = random() % 100;
+		//usleep(usecs);
+	}
+	printf("d");
+	done_var++;
+
+	return arg;
+}
+void the_p2_lock_test(int num_threads)
+{
+	//int tcount;
+	//pthread_t *thread_id;
+	double stupidness;
+
+	//printf("\n*** The Peterson's algo test\n");
+	global_p2_lock = p2_lock_init();
+	create_and_join_threads(num_threads, the_p2_lock_thread);
+	p2_lock_free(global_p2_lock);
+
+	stupidness =  (double)(num_threads*THE_M_VALUE);
+	stupidness /= (double)     protected_var;
+	stupidness -= 1.0;
+
+	printf("test done, stupidness is (%d/%d) - 1 = %f \n",
+			num_threads*THE_M_VALUE, protected_var, stupidness);
+	printf("the_pete_algo_lock_test %d,%f\n",num_threads, stupidness);
+}
+
+
 int main(int argc, char* argv[])
 {
 	/* atleast two, please!*/
@@ -126,8 +207,14 @@ int main(int argc, char* argv[])
 //	protected_var = 0;
 //	the_correct_spinlock_test(the_N_value);
 
+//	protected_var = 0;
+//	the_really_bad_lock_test(the_N_value);
+
+//	protected_var = 0;
+//	the_ct_lock_test(the_N_value);
+
 	protected_var = 0;
-	the_really_bad_lock_test(the_N_value);
+	the_p2_lock_test(the_N_value);
 
 	return 0;
 }
