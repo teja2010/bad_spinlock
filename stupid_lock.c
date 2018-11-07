@@ -182,3 +182,26 @@ void p2_unlock(struct pete2_lock *ptl, int id)
 	ptl->flags[id] = false;
 }
 
+
+/* My simple atomic var lock
+ */
+struct simple_atomic_lock* simat_lock_init()
+{
+	struct simple_atomic_lock *one;
+	one = (struct simple_atomic_lock*)
+				calloc(1, sizeof(struct simple_atomic_lock));
+	__atomic_clear(&one->lock, __ATOMIC_SEQ_CST);
+
+	return one;
+}
+void simpat_lock(struct simple_atomic_lock *one)
+{
+	/* returns true if the value at lock is set (non-zero) */
+	while(__atomic_test_and_set((void*)&one->lock, __ATOMIC_SEQ_CST)
+								      == true);
+}
+
+void simpat_unlock(struct simple_atomic_lock *one)
+{
+	__atomic_clear(&one->lock, __ATOMIC_SEQ_CST);
+}

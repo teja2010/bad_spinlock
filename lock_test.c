@@ -181,11 +181,60 @@ void the_p2_lock_test(int num_threads)
 	printf("the_pete_algo_lock_test %d,%f\n",num_threads, stupidness);
 }
 
+/* test 4 : my SIMPle ATomic lock */
+struct simple_atomic_lock * global_simpat_lock;
+int global_atomic_int;
+void* the_simpat_lock_thread(void *arg)
+{
+	long int i = THE_M_VALUE;
+
+	printf("s");
+	while(i--) {
+		simpat_lock(global_simpat_lock);
+		protected_var++;
+		simpat_unlock(global_simpat_lock);
+	}
+
+	// // instead do this, increment a atomic global itself.
+	// // commenting out since we want to see how stupid it is to use
+	// // various *locks* . Adding a test without locks is stupid.
+	// // TLDR: wow, no lock, such stupid.
+	//
+	//struct timespec ts = { 0, 100};
+	//while(i--) {
+	//	protected_var = __atomic_add_fetch(&global_atomic_int, 1,
+	//					   __ATOMIC_RELAXED);
+	//	nanosleep(&ts, NULL);
+	//}
+
+	printf("d");
+	done_var++;
+
+	return arg;
+}
+void the_simpat_lock_test(int num_threads)
+{
+	double stupidness;
+
+	printf("\n*** The CORRECT SPIN LOCK test\n");
+	global_simpat_lock = simat_lock_init();
+	create_and_join_threads(num_threads, the_simpat_lock_thread);
+
+	stupidness =  (double)(num_threads*THE_M_VALUE);
+	stupidness /= (double)     protected_var;
+	stupidness -= 1.0;
+
+	printf("test done, stupidness is (%d/%d) - 1 = %f \n",
+			num_threads*THE_M_VALUE, protected_var, stupidness);
+	printf("the_simpat_lock_test %d,%f\n",num_threads, stupidness);
+}
+
 
 int main(int argc, char* argv[])
 {
 	/* atleast two, please!*/
 	int the_N_value = 2;
+	protected_var = 0;
 
 	if(argc != 2) {
 		printf("Just one arg, number of threads.\ne.g. ./test 3\n");
@@ -204,17 +253,15 @@ int main(int argc, char* argv[])
 
 	/*comment out if running all of them for large N values is taking long*/
 
-//	protected_var = 0;
 //	the_correct_spinlock_test(the_N_value);
 
-//	protected_var = 0;
 //	the_really_bad_lock_test(the_N_value);
 
-//	protected_var = 0;
 //	the_ct_lock_test(the_N_value);
 
-	protected_var = 0;
-	the_p2_lock_test(the_N_value);
+//	the_p2_lock_test(the_N_value);
+
+	the_simpat_lock_test(the_N_value);
 
 	return 0;
 }
@@ -237,8 +284,10 @@ void create_and_join_threads(int num_threads, void* func(void* arg))
 	}
 	printf("C");
 
-	if(done_var <  num_threads) /*rather optimistic :D */
+	while (done_var <  0.9 * num_threads) { /*rather optimistic :D */
 		sleep(1);
+		printf("w\n");
+	}
 
 	/*join the threads*/
 	for(tcount =0; tcount < num_threads; tcount++) {

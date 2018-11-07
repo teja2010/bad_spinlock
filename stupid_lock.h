@@ -49,3 +49,13 @@ struct pete2_lock* p2_lock_init();
 void p2_lock_free(struct pete2_lock *ptl);
 void p2_lock(struct pete2_lock *ptl, int id);
 void p2_unlock(struct pete2_lock *ptl, int id);
+
+/*
+ * My SIMple ATomic lock
+ */
+struct simple_atomic_lock {
+	bool lock;
+};
+struct simple_atomic_lock* simat_lock_init();
+void simpat_lock(struct simple_atomic_lock *one);
+void simpat_unlock(struct simple_atomic_lock *one);
