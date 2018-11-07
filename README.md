@@ -4,7 +4,7 @@ some BAD userspace spinlock implementations
 ### run the tests:
 compilation:
 
-gcc  stupid_lock.c  lock_test.c -pthread
+make
 
 run tests: ./a.out N
 

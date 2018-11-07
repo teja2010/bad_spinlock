@@ -16,9 +16,10 @@
 #include <unistd.h>
 #include "stupid_lock.h"
 
-#define THE_M_VALUE  1000000
+#define THE_M_VALUE  10000
 
 int protected_var = 0;
+int done_var = 0;
 
 /* some common func definitions*/
 void create_and_join_threads(int num_threads, void* func(void* arg));
@@ -36,12 +37,14 @@ void* the_correct_spinlock_thread(void *arg)
 		pthread_spin_unlock(global_pthread_lock);
 	}
 	printf("d");
+
+	return arg;
 }
 
 void the_correct_spinlock_test(int num_threads)
 {
-	int tcount;
-	pthread_t *thread_id;
+	//int tcount;
+	//pthread_t *thread_id;
 	double stupidness;
 	pthread_spinlock_t lock;
 
@@ -73,12 +76,15 @@ void* the_really_bad_lock_thread(void *arg)
 		really_bad_unlock(global_rbl_lock);
 	}
 	printf("d");
+	done_var++;
+
+	return arg;
 }
 
 void the_really_bad_lock_test(int num_threads)
 {
-	int tcount;
-	pthread_t *thread_id;
+	//int tcount;
+	//pthread_t *thread_id;
 	double stupidness;
 
 	printf("\n*** The REALLY BAD LOCK test\n");
@@ -131,17 +137,22 @@ void create_and_join_threads(int num_threads, void* func(void* arg))
 {
 	int tcount;
 	pthread_t *thread_id;
+	int *ID;
 
 	// thess commands shud succeed mostly. TODO add checks for them
 	thread_id = calloc(num_threads, sizeof(pthread_t));
+	ID = calloc(num_threads, sizeof(int));
 
-	for(tcount =0; tcount < num_threads; tcount++){
+	for(tcount =0; tcount < num_threads; tcount++) {
+		ID[tcount] = tcount;
 		pthread_create(&thread_id[tcount], NULL,
-				func, NULL);
+				func, (void*)&ID[tcount]);
 	}
 	printf("C");
 
-	sleep(num_threads/10+1);
+	if(done_var <  num_threads) /*rather optimistic :D */
+		sleep(1);
+
 	/*join the threads*/
 	for(tcount =0; tcount < num_threads; tcount++) {
 		pthread_join(thread_id[tcount], NULL);
