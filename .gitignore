@@ -1,6 +1,8 @@
 .*
 *.out
 *.o
+lock_time_test
+stupid_locks
 
 cscope.*
 TAGS

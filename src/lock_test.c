@@ -37,6 +37,7 @@ void* the_correct_spinlock_thread(void *arg)
 		pthread_spin_unlock(global_pthread_lock);
 	}
 	printf("d");
+	done_var++;
 
 	return arg;
 }
@@ -57,6 +58,8 @@ void the_correct_spinlock_test(int num_threads)
 	stupidness =  (double)(num_threads*THE_M_VALUE);
 	stupidness /= (double)     protected_var;
 	stupidness -= 1.0;
+	if(stupidness < 0)
+		stupidness *= (-1);
 
 	printf("test done, stupidness is (%d/%d) - 1 = %f \n",
 			num_threads*THE_M_VALUE, protected_var, stupidness);
@@ -95,6 +98,8 @@ void the_really_bad_lock_test(int num_threads)
 	stupidness =  (double)(num_threads*THE_M_VALUE);
 	stupidness /= (double)     protected_var;
 	stupidness -= 1.0;
+	if(stupidness < 0)
+		stupidness *= (-1);
 
 	printf("test done, stupidness is (%d/%d) - 1 = %f \n",
 			num_threads*THE_M_VALUE, protected_var, stupidness);
@@ -134,6 +139,8 @@ void the_ct_lock_test(int num_threads)
 	stupidness =  (double)(num_threads*THE_M_VALUE);
 	stupidness /= (double)     protected_var;
 	stupidness -= 1.0;
+	if(stupidness < 0)
+		stupidness *= (-1);
 
 	printf("test done, stupidness is (%d/%d) - 1 = %f \n",
 			num_threads*THE_M_VALUE, protected_var, stupidness);
@@ -175,6 +182,8 @@ void the_p2_lock_test(int num_threads)
 	stupidness =  (double)(num_threads*THE_M_VALUE);
 	stupidness /= (double)     protected_var;
 	stupidness -= 1.0;
+	if(stupidness < 0)
+		stupidness *= (-1);
 
 	printf("test done, stupidness is (%d/%d) - 1 = %f \n",
 			num_threads*THE_M_VALUE, protected_var, stupidness);
@@ -223,6 +232,8 @@ void the_simpat_lock_test(int num_threads)
 	stupidness =  (double)(num_threads*THE_M_VALUE);
 	stupidness /= (double)     protected_var;
 	stupidness -= 1.0;
+	if(stupidness < 0)
+		stupidness *= (-1);
 
 	printf("test done, stupidness is (%d/%d) - 1 = %f \n",
 			num_threads*THE_M_VALUE, protected_var, stupidness);
@@ -253,13 +264,13 @@ int main(int argc, char* argv[])
 
 	/*comment out if running all of them for large N values is taking long*/
 
-//	the_correct_spinlock_test(the_N_value);
+	the_correct_spinlock_test(the_N_value);
 
-//	the_really_bad_lock_test(the_N_value);
+	the_really_bad_lock_test(the_N_value);
 
 //	the_ct_lock_test(the_N_value);
 
-//	the_p2_lock_test(the_N_value);
+	the_p2_lock_test(the_N_value);
 
 	the_simpat_lock_test(the_N_value);
 
