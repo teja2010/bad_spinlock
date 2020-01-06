@@ -1,4 +1,4 @@
-#bad_spinlock
+# bad_spinlock
 
 some BAD userspace spinlock implementations
 
@@ -51,7 +51,7 @@ or  `sh run_test.sh`
 
  With a real lock,
  ```
- T_r = W + w*M*N
+ T_r = W + u*M*N
 
  W = (T_r - T_i)
    = T_r - N*T0
@@ -60,7 +60,7 @@ or  `sh run_test.sh`
          T0  == reference number, defined above
  ```
 
- Table comparing ```(T_0, T_r_spinlock, T_r_mutex)```
+ Table comparing ```(T_i, T_r_spinlock, T_r_mutex)```
 
 | CPU\Threads | 1                  | 2                  | 4                    | 8                      | 16                | 32                 |
 |-------------|--------------------|--------------------|----------------------|------------------------|-------------------|--------------------|
@@ -70,5 +70,6 @@ or  `sh run_test.sh`
 | 6           | (0.42, 0.42, 0.42) | (0.89, 1.50, 4.97) | (3.4, 7.17, 23.17)   | (8.3, 19.9, 94)        | (21.57, 149, 324) | (82, 1872, 1298)   |
 | 8           | (0.42, 0.42, 0.42) | (1.55, 2.10, 5.4)  | (3.66, 7.2, 22.93)   |                        | (28, 152, 370)    | (73.1, 1855, 1317) |
 
-Inversion: (Thread/CPU) = (4/1), (8/2), (16/4), (32/8)
+Inversion: (Thread/CPU) = (4/1), (8/2), (16/4), (32/8). 
+
 Spinlocks are better if Threads/CPU < 4
